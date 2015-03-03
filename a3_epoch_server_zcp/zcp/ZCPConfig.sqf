@@ -33,4 +33,4 @@ ZCP_ContestColor = "ColorOPFOR"; // contested capped marker color
 
 ZCP_MinWaitTime = 60; // seconds to wait to spawn a new capturepoint when 1 was capped.
 
-ZCP_Version = "0.1";
+ZCP_Version = "1.0";
