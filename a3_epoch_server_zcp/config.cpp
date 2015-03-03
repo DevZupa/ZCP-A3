@@ -7,7 +7,7 @@ class CfgPatches {
 	};
 };
 class CfgFunctions {
-	class custom {
+	class zcp {
 		class main {
 			file = "x\addons\a3_epoch_server_zcp\init";
 			class init {
