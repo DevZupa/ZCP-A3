@@ -1,16 +1,10 @@
-/*
-* 	THese are modified WAI FUNCTIONS
-*/
-
 if(isServer) then {	
 	private ["_i","_safepos","_validspot","_position"];
 	_safepos		= [getMarkerPos "center",0,8500,(_this select 0),0,0.5,0];
 	_validspot 	= false;
 	_i 			= 1;
 	while{!_validspot} do {
-	
 		sleep 1;
-
 		_position 	= _safepos call BIS_fnc_findSafePos;
 		_i 			= _i + 1;
 		_validspot	= true;

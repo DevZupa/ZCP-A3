@@ -14,7 +14,7 @@ _randomTime = (floor random  100) + ZCP_MinWaitTime ;
 
 diag_log text format ["[ZCP]: Waiting %1 secs for next cap point.",_randomTime];
 
-sleep _randomTime;
+UIsleep _randomTime;
 
 diag_log text format ["[ZCP]: Waiting for %1 players to be online.",ZCP_Minimum_Online_Players];
 
@@ -30,7 +30,7 @@ if(ZCP_StaticPoints)then{
 	_capturePosition = _this select 1;
 	diag_log text format ["[ZCP]: %1 :Spawning static on %2",_ZCP_name,_capturePosition];
 }else{
-	_capturePosition = [20] call ZCP_fnc_find_position;
+	_capturePosition = [40] call ZCP_fnc_find_position;
 	diag_log text format ["[ZCP]: %1 :Spawning dynamic on %2",_ZCP_name,_capturePosition];
 };
 
@@ -108,7 +108,7 @@ if(count _ZCP_baseObjects != 0)then{
 				_dot 			setMarkerColor "ColorBlack";
 				_dot 			setMarkerType "hd_flag";
 				_dot 			setMarkerText _name;
-				sleep 1;
+				UIsleep 1;
 				deleteMarker 	_marker;
 				deleteMarker 	_dot;			
 			};
@@ -191,7 +191,7 @@ if(count _ZCP_baseObjects != 0)then{
 	
 	_this execVM format["x\addons\a3_epoch_server_zcp\zcp\start.sqf",_this select 2];	
 	
-	sleep ZCP_BaseCleanupDelay;
+	UIsleep ZCP_BaseCleanupDelay;
 	
 	{
 		deleteVehicle _x;
