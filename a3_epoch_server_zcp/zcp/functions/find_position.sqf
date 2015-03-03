@@ -8,11 +8,9 @@ if(isServer) then {
 		_position 	= _safepos call BIS_fnc_findSafePos;
 		_i 			= _i + 1;
 		_validspot	= true;
-
 		if (_position call ZCP_fnc_inDebug) then { 
 			_validspot = false; 
 		}; 
-
 		if(_validspot ) then {
 			if ([_position,10] call ZCP_fnc_isNearWater) then { 
 			_validspot = false;

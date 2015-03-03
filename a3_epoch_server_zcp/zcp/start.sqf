@@ -79,7 +79,8 @@ if(count _ZCP_baseObjects != 0)then{
 	_ZCP_startContested = 0;	
 	_ZCP_wasContested = false;
 	_ZCP_continue = true;		
-
+	_ZCP_Halfway = false;
+	_ZCP_min = false;
      
 	
 	_this spawn { // based on wicked AI marker system.
@@ -117,8 +118,7 @@ if(count _ZCP_baseObjects != 0)then{
 	while{_ZCP_continue}do{					
 			// check if someone is close
 			_proximityList = [];	
-			{
-				
+			{			
 				if(isPlayer _x && alive _x)then{
 					_nil =  _proximityList pushBack _x;
 				};
@@ -128,13 +128,17 @@ if(count _ZCP_baseObjects != 0)then{
 				_ZCP_currentCapper = objNull;
 				_ZCP_previousCapper = objNull;
 				(ZCP_Data select _ZCP_index) set[1,0];
-				_ZCP_wasContested = false;			
+				_ZCP_wasContested = false;	
+				_ZCP_Halfway = false;
+				_ZCP_min = false;				
 			}else{	
 				if(_ZCP_previousCapper in _proximityList)then{		
 					_ZCP_currentCapper = _ZCP_previousCapper; 
 					(ZCP_Data select _ZCP_index) set[1,1];
 				}else{
 					_ZCP_wasContested = false;	
+					_ZCP_Halfway = false;
+					_ZCP_min = false;
 					_ZCP_currentCapper = _proximityList select 0;
 					(ZCP_Data select _ZCP_index) set[1,1];
 					PV_ZCP_zupastic = ["ZCP",format["%1 is being captured by %2. You have %3 minutes to prevent this.",_ZCP_name,name _ZCP_currentCapper,(ZCP_CapTime / 60)]];
@@ -161,7 +165,20 @@ if(count _ZCP_baseObjects != 0)then{
 						_ZCP_continue = false;				
 						_ZCP_startContested = 0;
 						_ZCP_wasContested = false;	
-				};		
+				};	
+
+				if( !_ZCP_Halfway && _ZCP_startContested != 0 && (diag_tickTime - _ZCP_startContested) >  (ZCP_CapTime / 2)then{				
+					PV_ZCP_zupastic = ["ZCP",format["%1 is 50% captured by %2. You still have %3 minutes to prevent this.",_ZCP_name,name _ZCP_currentCapper,(ZCP_CapTime / 2 / 60)]];
+					publicVariable "PV_ZCP_zupastic";		
+					_ZCP_Halfway = true;				
+				};	
+				
+				if( !_ZCP_min && _ZCP_startContested != 0 && (diag_tickTime - _ZCP_startContested) >  (ZCP_CapTime - 60)then{					
+					PV_ZCP_zupastic = ["ZCP",format["%1 is almost captured by %2. 60 seconds left. Move in!",_ZCP_name,name _ZCP_currentCapper]];
+					publicVariable "PV_ZCP_zupastic";		
+					_ZCP_min = false;
+				};	
+			
 				_ZCP_previousCapper = _ZCP_currentCapper;					
 			};																						
 		uiSleep 1;

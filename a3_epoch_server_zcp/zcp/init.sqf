@@ -1,7 +1,7 @@
 /*
 	Zupa's Capture Points
 	Initiates the cap actions.
-	Capture points and earn money over time.
+	Capture points and earn money.
 */
 
 diag_log text format ["[ZCP]: Giving server some time to boot."];
