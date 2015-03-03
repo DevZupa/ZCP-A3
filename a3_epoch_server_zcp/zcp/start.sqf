@@ -7,14 +7,20 @@
 private["_currentCapper","_ZCP_continue","_ZCP_flag","_currentGroup","_ZCP_name","_ZCP_baseFile","_ZCP_baseClasses",
 "_ZCP_lastOwnerChange","_proximityList","_ZCP_baseObjects","_theFlagPos","_theFlagX","_theFlagY","_XChange","_YChange",
 "_ZCP_currentCapper","_ZCP_previousCapper","_ZCP_currentGroup","_ZCP_wasContested",
-"_ZCP_startContested","_ZCP_index","_capturePosition","_randomTime"
+"_ZCP_startContested","_ZCP_index","_capturePosition","_randomTime","_changedReward","_ZCP_Halfway","_ZCP_min"
 ];
 
 _randomTime = (floor random  100) + ZCP_MinWaitTime ;
 
-	diag_log text format ["[ZCP]: Waiting %1 secs for next cap point.",_randomTime];
+diag_log text format ["[ZCP]: Waiting %1 secs for next cap point.",_randomTime];
 
-sleep _randomTime;
+UIsleep _randomTime;
+
+diag_log text format ["[ZCP]: Waiting for %1 players to be online.",ZCP_Minimum_Online_Players];
+
+waitUntil { count( playableUnits ) > ( ZCP_Minimum_Online_Players - 1 ) };
+
+diag_log text format ["[ZCP]: %1 players reached, starting cap point.",ZCP_Minimum_Online_Players];
 
 _capturePosition = [0,0,0];
 _ZCP_name = _this select 0;
@@ -24,7 +30,7 @@ if(ZCP_StaticPoints)then{
 	_capturePosition = _this select 1;
 	diag_log text format ["[ZCP]: %1 :Spawning static on %2",_ZCP_name,_capturePosition];
 }else{
-	_capturePosition = [20] call ZCP_fnc_find_position;
+	_capturePosition = [40] call ZCP_fnc_find_position;
 	diag_log text format ["[ZCP]: %1 :Spawning dynamic on %2",_ZCP_name,_capturePosition];
 };
 
@@ -73,7 +79,8 @@ if(count _ZCP_baseObjects != 0)then{
 	_ZCP_startContested = 0;	
 	_ZCP_wasContested = false;
 	_ZCP_continue = true;		
-
+	_ZCP_Halfway = false;
+	_ZCP_min = false;
      
 	
 	_this spawn { // based on wicked AI marker system.
@@ -102,7 +109,7 @@ if(count _ZCP_baseObjects != 0)then{
 				_dot 			setMarkerColor "ColorBlack";
 				_dot 			setMarkerType "hd_flag";
 				_dot 			setMarkerText _name;
-				sleep 1;
+				UIsleep 1;
 				deleteMarker 	_marker;
 				deleteMarker 	_dot;			
 			};
@@ -111,8 +118,7 @@ if(count _ZCP_baseObjects != 0)then{
 	while{_ZCP_continue}do{					
 			// check if someone is close
 			_proximityList = [];	
-			{
-				
+			{			
 				if(isPlayer _x && alive _x)then{
 					_nil =  _proximityList pushBack _x;
 				};
@@ -122,13 +128,17 @@ if(count _ZCP_baseObjects != 0)then{
 				_ZCP_currentCapper = objNull;
 				_ZCP_previousCapper = objNull;
 				(ZCP_Data select _ZCP_index) set[1,0];
-				_ZCP_wasContested = false;			
+				_ZCP_wasContested = false;	
+				_ZCP_Halfway = false;
+				_ZCP_min = false;				
 			}else{	
 				if(_ZCP_previousCapper in _proximityList)then{		
 					_ZCP_currentCapper = _ZCP_previousCapper; 
 					(ZCP_Data select _ZCP_index) set[1,1];
 				}else{
 					_ZCP_wasContested = false;	
+					_ZCP_Halfway = false;
+					_ZCP_min = false;
 					_ZCP_currentCapper = _proximityList select 0;
 					(ZCP_Data select _ZCP_index) set[1,1];
 					PV_ZCP_zupastic = ["ZCP",format["%1 is being captured by %2. You have %3 minutes to prevent this.",_ZCP_name,name _ZCP_currentCapper,(ZCP_CapTime / 60)]];
@@ -151,20 +161,44 @@ if(count _ZCP_baseObjects != 0)then{
 				// capture check		
 							
 				if( _ZCP_startContested != 0 && (diag_tickTime - _ZCP_startContested) >  ZCP_CapTime )then{
-						// player survived for x seconds so he claimed the area
-							diag_log text format ["[ZCP]: %1 won %2",name _ZCP_currentCapper,_ZCP_name,0];
+						// player survived for x seconds so he claimed the area							
 						_ZCP_continue = false;				
 						_ZCP_startContested = 0;
 						_ZCP_wasContested = false;	
-				};		
+				};	
+
+				if( !_ZCP_Halfway && _ZCP_startContested != 0 && (diag_tickTime - _ZCP_startContested) >  (ZCP_CapTime / 2))then{				
+					PV_ZCP_zupastic = ["ZCP",format["%1 is 50%4 captured by %2. You still have %3 minutes to prevent this.",_ZCP_name,name _ZCP_currentCapper,(ZCP_CapTime / 2 / 60),"%"]];
+					publicVariable "PV_ZCP_zupastic";		
+					_ZCP_Halfway = true;				
+				};	
+				
+				if( !_ZCP_min && _ZCP_startContested != 0 && (diag_tickTime - _ZCP_startContested) >  (ZCP_CapTime - 60))then{					
+					PV_ZCP_zupastic = ["ZCP",format["%1 is almost captured by %2. 60 seconds left. Move in!",_ZCP_name,name _ZCP_currentCapper]];
+					publicVariable "PV_ZCP_zupastic";		
+					_ZCP_min = false;
+				};	
+			
 				_ZCP_previousCapper = _ZCP_currentCapper;					
 			};																						
 		uiSleep 1;
 	};
 	
-	[["effectCrypto",ZCP_KryptoReward],owner _ZCP_currentCapper]call EPOCH_sendPublicVariableClient;					
-	PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto.",_ZCP_name,name _ZCP_currentCapper,ZCP_KryptoReward]];
-	publicVariable "PV_ZCP_zupastic";		
+	if(ZCP_RewardRelativeToPlayersOnline)then{
+		_changedReward = (ZCP_KryptoReward / ZCP_ServerMaxPlayers) * (count playableUnits);
+		if(_changedReward < ZCP_MinKryptoReward)then{
+			_changedReward = ZCP_MinKryptoReward;
+		};
+		[["effectCrypto",floor(_changedReward)],owner _ZCP_currentCapper]call EPOCH_sendPublicVariableClient;					
+		PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto. The base will dismantle in %4 seconds.",_ZCP_name,name _ZCP_currentCapper,floor(_changedReward),ZCP_BaseCleanupDelay]];
+		publicVariable "PV_ZCP_zupastic";
+		diag_log text format ["[ZCP]: %1 won %2, received %3 Krypto",name _ZCP_currentCapper,_ZCP_name, floor(_changedReward)];
+	}else{	
+		[["effectCrypto",ZCP_KryptoReward],owner _ZCP_currentCapper]call EPOCH_sendPublicVariableClient;					
+		PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto. The base will dismantle in %4 seconds.",_ZCP_name,name _ZCP_currentCapper,ZCP_KryptoReward,ZCP_BaseCleanupDelay]];
+		publicVariable "PV_ZCP_zupastic";	
+		diag_log text format ["[ZCP]: %1 won %2, received %3 Krypto",name _ZCP_currentCapper,_ZCP_name,ZCP_KryptoReward];
+	};	
 
 	/* point was capped , reboot the cappoint*/ 
 	(ZCP_Data select _ZCP_index) set[0,false];
@@ -174,7 +208,7 @@ if(count _ZCP_baseObjects != 0)then{
 	
 	_this execVM format["x\addons\a3_epoch_server_zcp\zcp\start.sqf",_this select 2];	
 	
-	sleep 60;
+	UIsleep ZCP_BaseCleanupDelay;
 	
 	{
 		deleteVehicle _x;
