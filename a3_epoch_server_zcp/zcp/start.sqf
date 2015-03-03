@@ -168,7 +168,7 @@ if(count _ZCP_baseObjects != 0)then{
 				};	
 
 				if( !_ZCP_Halfway && _ZCP_startContested != 0 && (diag_tickTime - _ZCP_startContested) >  (ZCP_CapTime / 2))then{				
-					PV_ZCP_zupastic = ["ZCP",format["%1 is 50% captured by %2. You still have %3 minutes to prevent this.",_ZCP_name,name _ZCP_currentCapper,(ZCP_CapTime / 2 / 60)]];
+					PV_ZCP_zupastic = ["ZCP",format["%1 is 50%4 captured by %2. You still have %3 minutes to prevent this.",_ZCP_name,name _ZCP_currentCapper,(ZCP_CapTime / 2 / 60),"%"]];
 					publicVariable "PV_ZCP_zupastic";		
 					_ZCP_Halfway = true;				
 				};	
@@ -190,15 +190,15 @@ if(count _ZCP_baseObjects != 0)then{
 			_changedReward = ZCP_MinKryptoReward;
 		};
 		[["effectCrypto",floor(_changedReward)],owner _ZCP_currentCapper]call EPOCH_sendPublicVariableClient;					
-		PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto. The base will dismantle in seconds.",_ZCP_name,name _ZCP_currentCapper,floor(_changedReward),ZCP_BaseCleanupDelay]];
+		PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto. The base will dismantle in %4 seconds.",_ZCP_name,name _ZCP_currentCapper,floor(_changedReward),ZCP_BaseCleanupDelay]];
 		publicVariable "PV_ZCP_zupastic";
 		diag_log text format ["[ZCP]: %1 won %2, received %3 Krypto",name _ZCP_currentCapper,_ZCP_name, floor(_changedReward)];
 	}else{	
 		[["effectCrypto",ZCP_KryptoReward],owner _ZCP_currentCapper]call EPOCH_sendPublicVariableClient;					
-		PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto. The base will dismantle in seconds.",_ZCP_name,name _ZCP_currentCapper,ZCP_KryptoReward,ZCP_BaseCleanupDelay]];
+		PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto. The base will dismantle in %4 seconds.",_ZCP_name,name _ZCP_currentCapper,ZCP_KryptoReward,ZCP_BaseCleanupDelay]];
 		publicVariable "PV_ZCP_zupastic";	
 		diag_log text format ["[ZCP]: %1 won %2, received %3 Krypto",name _ZCP_currentCapper,_ZCP_name,ZCP_KryptoReward];
-	}	
+	};	
 
 	/* point was capped , reboot the cappoint*/ 
 	(ZCP_Data select _ZCP_index) set[0,false];
