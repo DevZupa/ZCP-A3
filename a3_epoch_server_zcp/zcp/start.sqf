@@ -7,14 +7,20 @@
 private["_currentCapper","_ZCP_continue","_ZCP_flag","_currentGroup","_ZCP_name","_ZCP_baseFile","_ZCP_baseClasses",
 "_ZCP_lastOwnerChange","_proximityList","_ZCP_baseObjects","_theFlagPos","_theFlagX","_theFlagY","_XChange","_YChange",
 "_ZCP_currentCapper","_ZCP_previousCapper","_ZCP_currentGroup","_ZCP_wasContested",
-"_ZCP_startContested","_ZCP_index","_capturePosition","_randomTime"
+"_ZCP_startContested","_ZCP_index","_capturePosition","_randomTime","_changedReward"
 ];
 
 _randomTime = (floor random  100) + ZCP_MinWaitTime ;
 
-	diag_log text format ["[ZCP]: Waiting %1 secs for next cap point.",_randomTime];
+diag_log text format ["[ZCP]: Waiting %1 secs for next cap point.",_randomTime];
 
 sleep _randomTime;
+
+diag_log text format ["[ZCP]: Waiting for %1 players to be online.",ZCP_Minimum_Online_Players];
+
+waitUntil { count( playableUnits ) > ( ZCP_Minimum_Online_Players - 1 ) };
+
+diag_log text format ["[ZCP]: %1 players reached, starting cap point.",ZCP_Minimum_Online_Players];
 
 _capturePosition = [0,0,0];
 _ZCP_name = _this select 0;
@@ -151,8 +157,7 @@ if(count _ZCP_baseObjects != 0)then{
 				// capture check		
 							
 				if( _ZCP_startContested != 0 && (diag_tickTime - _ZCP_startContested) >  ZCP_CapTime )then{
-						// player survived for x seconds so he claimed the area
-							diag_log text format ["[ZCP]: %1 won %2",name _ZCP_currentCapper,_ZCP_name,0];
+						// player survived for x seconds so he claimed the area							
 						_ZCP_continue = false;				
 						_ZCP_startContested = 0;
 						_ZCP_wasContested = false;	
@@ -162,9 +167,21 @@ if(count _ZCP_baseObjects != 0)then{
 		uiSleep 1;
 	};
 	
-	[["effectCrypto",ZCP_KryptoReward],owner _ZCP_currentCapper]call EPOCH_sendPublicVariableClient;					
-	PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto.",_ZCP_name,name _ZCP_currentCapper,ZCP_KryptoReward]];
-	publicVariable "PV_ZCP_zupastic";		
+	if(ZCP_RewardRelativeToPlayersOnline)then{
+		_changedReward = (ZCP_KryptoReward / ZCP_ServerMaxPlayers) * (count playableUnits);
+		if(_changedReward < ZCP_MinKryptoReward)then{
+			_changedReward = ZCP_MinKryptoReward;
+		};
+		[["effectCrypto",floor(_changedReward)],owner _ZCP_currentCapper]call EPOCH_sendPublicVariableClient;					
+		PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto.",_ZCP_name,name _ZCP_currentCapper,floor(_changedReward)]];
+		publicVariable "PV_ZCP_zupastic";
+		diag_log text format ["[ZCP]: %1 won %2, received %3 Krypto",name _ZCP_currentCapper,_ZCP_name, floor(_changedReward)];
+	}else{	
+		[["effectCrypto",ZCP_KryptoReward],owner _ZCP_currentCapper]call EPOCH_sendPublicVariableClient;					
+		PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto.",_ZCP_name,name _ZCP_currentCapper,ZCP_KryptoReward]];
+		publicVariable "PV_ZCP_zupastic";	
+		diag_log text format ["[ZCP]: %1 won %2, received %3 Krypto",name _ZCP_currentCapper,_ZCP_name,ZCP_KryptoReward];
+	}	
 
 	/* point was capped , reboot the cappoint*/ 
 	(ZCP_Data select _ZCP_index) set[0,false];
@@ -174,7 +191,7 @@ if(count _ZCP_baseObjects != 0)then{
 	
 	_this execVM format["x\addons\a3_epoch_server_zcp\zcp\start.sqf",_this select 2];	
 	
-	sleep 60;
+	sleep ZCP_BaseCleanupDelay;
 	
 	{
 		deleteVehicle _x;

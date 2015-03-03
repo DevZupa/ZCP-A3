@@ -19,7 +19,7 @@ ZCP_Data = [];
 {
 	ZCP_Data pushBack [true,0];
 	_x execVM "x\addons\a3_epoch_server_zcp\zcp\start.sqf";	
-	diag_log text format ["[ZCP]: ZCP No %1 started.",_x select 4];
+	diag_log text format ["[ZCP]: No %1 started.",_x select 4];
 }count ZCP_CapPoints;
 
 diag_log text format ["[ZCP]: All Capture Points are running."];
