@@ -11,7 +11,6 @@ sleep 120;
 diag_log text format ["[ZCP]: Initiate Zupa's Capture Points"];
 call compile preprocessFileLineNumbers "x\addons\a3_epoch_server_zcp\zcp\ZCPConfig.sqf";
 call compile preprocessFileLineNumbers "x\addons\a3_epoch_server_zcp\zcp\functions\position_functions.sqf";
-ZCP_fnc_cleanUpBase = call compile preprocessFile "x\addons\a3_epoch_server_zcp\zcp\functions\cleanupBase.sqf";
 ZCP_fnc_find_position	= compile preprocessFileLineNumbers "x\addons\a3_epoch_server_zcp\zcp\functions\find_position.sqf";
 
 ZCP_Data = [];
