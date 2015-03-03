@@ -190,12 +190,12 @@ if(count _ZCP_baseObjects != 0)then{
 			_changedReward = ZCP_MinKryptoReward;
 		};
 		[["effectCrypto",floor(_changedReward)],owner _ZCP_currentCapper]call EPOCH_sendPublicVariableClient;					
-		PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto.",_ZCP_name,name _ZCP_currentCapper,floor(_changedReward)]];
+		PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto. The base will dismantle in seconds.",_ZCP_name,name _ZCP_currentCapper,floor(_changedReward),ZCP_BaseCleanupDelay]];
 		publicVariable "PV_ZCP_zupastic";
 		diag_log text format ["[ZCP]: %1 won %2, received %3 Krypto",name _ZCP_currentCapper,_ZCP_name, floor(_changedReward)];
 	}else{	
 		[["effectCrypto",ZCP_KryptoReward],owner _ZCP_currentCapper]call EPOCH_sendPublicVariableClient;					
-		PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto.",_ZCP_name,name _ZCP_currentCapper,ZCP_KryptoReward]];
+		PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto. The base will dismantle in seconds.",_ZCP_name,name _ZCP_currentCapper,ZCP_KryptoReward,ZCP_BaseCleanupDelay]];
 		publicVariable "PV_ZCP_zupastic";	
 		diag_log text format ["[ZCP]: %1 won %2, received %3 Krypto",name _ZCP_currentCapper,_ZCP_name,ZCP_KryptoReward];
 	}	
