@@ -6,9 +6,8 @@
 
 // First person in the Cap zone is the capper (If he leaves, the closest on of the group is the new capper but time is reset!).
 // When multiple people are in the zone and not in the same group, the zone is contested.
-// Contested zones do not get capped. You or your group need to be the only ones in it.
-// Being only one ( or group) in the zone starts the timer.
-// Holding a zone ( contested zone doesn't affect this) gives you a reward after 30 Min.
+// Being first in the zone starts the timer.
+// Holding a zone  gives you a reward after x Min.
 
 ZCP_CapTime = 300; // Seconds to cap an area uncontested
 ZCP_CapRadius = 70; // Meter radius of the capture circle around the flag.
