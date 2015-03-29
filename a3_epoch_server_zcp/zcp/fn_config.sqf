@@ -18,7 +18,7 @@
 // Being first in the zone starts the timer.
 // Holding a zone  gives you a reward after x Min.
 
-ZCP_CapTime = 30; // Seconds to cap an area uncontested
+ZCP_CapTime = 600; // Seconds to cap an area uncontested
 ZCP_CapRadius = 70; // Meter radius of the capture circle around the first object.
 ZCP_MinWaitTime = 20; // seconds to wait to spawn a new capturepoint when 1 was capped.
 ZCP_BaseCleanupDelay = 300; // seconds to wait to delete a captured base.
