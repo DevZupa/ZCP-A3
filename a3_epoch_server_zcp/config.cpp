@@ -9,10 +9,24 @@ class CfgPatches {
 class CfgFunctions {
 	class zcp {
 		class main {
-			file = "x\addons\a3_epoch_server_zcp\init";
-			class init {
-				postInit = 1;
-			};
+			file = "x\addons\a3_epoch_server_zcp\zcp";
+			class init {postInit = 1;};
+			class config {};
+			class missionLooper {};
+
+		};
+		class compileFunctions {
+			file = "x\addons\a3_epoch_server_zcp\zcp\functions";
+			class inDebug {};
+			class nearWater {};
+			class paraDrop {};
+			class start {};
+			class findPosition {};
+			class cleanupBase {};
+			class initCPData {};
+			class giveReward {};
+			class keepMarker {};
+			class createBase {};
 		};
 	};
 };
