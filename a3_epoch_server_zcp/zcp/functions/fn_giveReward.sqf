@@ -32,13 +32,13 @@ switch (_reward) do {
 		};
 			
 		_cIndex = EPOCH_customVars find "Crypto";
-		_vars =_ZCP_currentCapper getVariable["VARS",[] + EPOCH_defaultVars_SEPXVar];
+		_vars = _ZCP_currentCapper getVariable["VARS",[] + EPOCH_defaultVars_SEPXVar];
 		_current_crypto = _vars select _cIndex;
 		// epoch rules: Max 25000 cash on you.
 		_current_crypto = ( _current_crypto + _awardToGive )min 25000;
 
 		_vars set[_cIndex,_current_crypto];
-		_ZCP_currentCapper setVariable["VARS",_vars];
+		_ZCP_currentCapper setVariable["VARS",_vars,true];
 		[["effectCrypto",_current_crypto],owner _ZCP_currentCapper]call EPOCH_sendPublicVariableClient;
 
 		PV_ZCP_zupastic = ["ZCP",format["%2 captured %1 and received his %3 Krypto. The base will dismantle in %4 seconds.",_ZCP_name,name _ZCP_currentCapper,_awardToGive,ZCP_BaseCleanupDelay]];
