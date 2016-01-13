@@ -19,16 +19,23 @@ private["_currentCapper","_ZCP_continue","_ZCP_flag","_currentGroup","_ZCP_name"
 "_ZCP_startContested","_ZCP_index","_capturePosition","_randomTime","_changedReward","_ZCP_Halfway","_ZCP_min"
 ];
 
-_randomTime = (floor random  100) + ZCP_MinWaitTime ;
+_capturePosition = [0,0,0];
+_ZCP_name = _this select 0;
+_ZCP_index = _this select 4;
+_randomTime = 100;
+
+if( (ZCP_Data select _ZCP_index) select 2) then {
+	_randomTime = (floor random  100) + ZCP_MinWaitTime;	
+} else {
+	_randomTime = ZCP_StartMinWaitTime;		
+};
+
+(ZCP_Data select _ZCP_index) set[2, false];
 
 uiSleep _randomTime;
 diag_log text format ["[ZCP]: Waiting for %1 players to be online.",ZCP_Minimum_Online_Players];
 waitUntil { count( playableUnits ) > ( ZCP_Minimum_Online_Players - 1 ) };
 diag_log text format ["[ZCP]: %1 players reached, starting cap point.",ZCP_Minimum_Online_Players];
-
-_capturePosition = [0,0,0];
-_ZCP_name = _this select 0;
-_ZCP_index = _this select 4;
 
 if(ZCP_StaticPoints)then{
 	_capturePosition = _this select 1;
