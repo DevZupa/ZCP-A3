@@ -25,9 +25,9 @@ _ZCP_index = _this select 4;
 _randomTime = 100;
 
 if( (ZCP_Data select _ZCP_index) select 2) then {
-	_randomTime = (floor random  100) + ZCP_MinWaitTime;	
+	_randomTime = (floor random ZCP_WaitPeriodRandom) + ZCP_MinWaitTime;	
 } else {
-	_randomTime = ZCP_StartMinWaitTime;		
+	_randomTime = (floor random ZCP_WaitPeriodRandom) + ZCP_StartMinWaitTime;		
 };
 
 (ZCP_Data select _ZCP_index) set[2, false];
